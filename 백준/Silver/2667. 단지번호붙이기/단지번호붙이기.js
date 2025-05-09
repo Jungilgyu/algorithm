@@ -14,9 +14,10 @@ function bfs(i, j) {
 	const q = []
 	q.push([i, j])
 	visited[i][j] = true
+	let idx = 0 // q의 시작 인덱스
 	let res = 1
-	while (q.length > 0) {
-		const [x, y] = q.shift()
+	while (idx < q.length) {
+		const [x, y] = q[idx++]
 
 		for (let k = 0; k < 4; k++) {
 			const nx = x + di[k]
