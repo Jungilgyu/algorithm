@@ -3,8 +3,11 @@ from collections import deque
 
 n, k = map(int, input().split())
 belt = list(map(int, input().split()))
-robots = [False] * (2*n)
+robots = [False] * (n)
 
+# 시작 설정
+# robots[0] = True
+# belt[0] -= 1
 
 # 올리는 위치는 0, 내리는 위치는 n-1 인덱스로
 # q에 belt랑 robot 담기
@@ -44,7 +47,8 @@ while True:
     # 4. 내구도 0인 칸수 계산
     if zero >= k:
         break
-
+    # if belt_q.count(0) >= k:
+    #     break
     ans += 1
 
 print(ans)
