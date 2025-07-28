@@ -5,9 +5,6 @@ n, k = map(int, input().split())
 belt = list(map(int, input().split()))
 robots = [False] * (2*n)
 
-# 시작 설정
-# robots[0] = True
-# belt[0] -= 1
 
 # 올리는 위치는 0, 내리는 위치는 n-1 인덱스로
 # q에 belt랑 robot 담기
@@ -15,6 +12,7 @@ belt_q = deque(belt)
 robot_q = deque(robots)
 
 ans = 1
+zero = 0
 while True:
     # 순서대로 진행
     # 1. 벨트회전, 로봇과 벨트 함께 이동
@@ -30,6 +28,8 @@ while True:
                 robot_q[i] = False
                 robot_q[i+1] = True
                 belt_q[i+1] -= 1
+                if belt_q[i+1] == 0:
+                    zero += 1
                 # 만약 그게 내리는 위치면
                 if i+1 == n-1:
                     robot_q[i+1] = False # 내려주기
@@ -38,10 +38,13 @@ while True:
     if belt_q[0] > 0:
         robot_q[0] = True
         belt_q[0] -= 1
+        if belt_q[0] == 0:
+            zero += 1
 
     # 4. 내구도 0인 칸수 계산
-    if belt_q.count(0) >= k:
+    if zero >= k:
         break
+
     ans += 1
 
 print(ans)
