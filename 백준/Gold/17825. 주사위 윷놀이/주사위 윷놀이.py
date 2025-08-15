@@ -1,4 +1,5 @@
 import sys
+input = sys.stdin.readline
 
 dice = list(map(int, input().split()))
 
@@ -17,7 +18,7 @@ blue[15] = 26  # 30 → 28
 next_pos[21] = 22; next_pos[22] = 23; next_pos[23] = 29
 next_pos[24] = 25; next_pos[25] = 29
 next_pos[26] = 27; next_pos[27] = 28; next_pos[28] = 29
-next_pos[29] = 30; next_pos[30] = 31; next_pos[31] = 20  
+next_pos[29] = 30; next_pos[30] = 31; next_pos[31] = 20
 
 # 점수판
 score = [0] * 33
@@ -30,7 +31,7 @@ score[29], score[30], score[31] = 25, 30, 35
 score[32] = 0  # 도착
 
 def move(pos, step):
-    if pos == 32: 
+    if pos == 32:
         return 32
     if blue[pos]:  # 파란 화살표 출발점이면 경로 바꾸기
         pos = blue[pos]
@@ -38,16 +39,20 @@ def move(pos, step):
     while step > 0:
         pos = next_pos[pos]
         step -= 1
-        if pos == 32:  
+        if pos == 32:
             break
     return pos
 
-def dfs(turn, total):
-    global ans
-
+def dfs(turn, p0, p1, p2, p3):
     if turn == 10:
-        ans = max(ans, total)
-        return
+        return 0
+
+    state = (turn, p0, p1, p2, p3)
+    if state in memo:
+        return memo[state]
+
+    max_val = 0
+    p = [p0, p1, p2, p3]
 
     for i in range(4):
         cur = p[i]
@@ -57,10 +62,12 @@ def dfs(turn, total):
             continue
 
         p[i] = next
-        dfs(turn + 1, total + score[next])
+        max_val = max(max_val, score[next] + dfs(turn+1, p[0], p[1], p[2], p[3]))
         p[i] = cur
 
-ans = 0
-p = [0, 0, 0, 0]
-dfs(0, 0)
-print(ans)
+    memo[state] = max_val
+    return max_val
+
+memo = {}
+
+print(dfs(0, 0, 0, 0, 0))
