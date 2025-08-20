@@ -1,110 +1,105 @@
 import sys
 from collections import deque
+input = sys.stdin.readline
 
-
-# 입력
 n, m, f = map(int, input().split())
-area = [list(map(int, input().split())) for _ in range(n)]   
+area = [list(map(int, input().split())) for _ in range(n)]
 si, sj = map(int, input().split())
-si -= 1; sj -= 1  
+si -= 1; sj -= 1
 
-start_id = [[0]*n for _ in range(n)]
-passengers = {}  
+# 출발/목적 분리
+start_id = [[0]*n for _ in range(n)]  # 출발지 손님 번호
+dest = {}  # 손님번호 -> (ei, ej)
 
 pnum = 2
 for _ in range(m):
-    sr, sc, er, ec = map(int, input().split())
-    sr -= 1; sc -= 1; er -= 1; ec -= 1
-    start_id[sr][sc] = pnum         # 출발지에 손님 번호 기록
-    passengers[pnum] = (er, ec)     # 목적지 기록
+    pi, pj, ei, ej = map(int, input().split())
+    start_id[pi-1][pj-1] = pnum
+    dest[pnum] = (ei-1, ej-1)
     pnum += 1
 
-complete = [False] * (m + 5)
-di, dj = [0, 1, 0, -1], [1, 0, -1, 0]
+complete = [False]*(m+5)
+di, dj = [0,1,0,-1], [1,0,-1,0]
 
 # 손님 찾기
-def find_p(i, j, fuel):
+def find_p(i, j, ff):
     q = deque()
-    q.append((i, j))
-    dist = [[-1]*n for _ in range(n)]
-    dist[i][j] = 0
-    targets = []
+    q.append((i, j, ff))
+    visited = [[False]*n for _ in range(n)]
+    visited[i][j] = True
+
+    candidates = []
     min_d = float('inf')
 
     while q:
-        ci, cj = q.popleft()
-        d = dist[ci][cj]
+        ci, cj, cf = q.popleft()
+        dist = ff - cf  # 소모한 연료 = 거리
 
-        if d > min_d:
+        if cf < 0:  # 연료 바닥
+            continue
+
+        if dist > min_d:  # 더 먼 거리는 볼 필요 없음
             continue
 
         if start_id[ci][cj] > 0 and not complete[start_id[ci][cj]]:
-            if d < min_d:
-                min_d = d
-                targets = [(d, ci, cj, start_id[ci][cj])]
-            elif d == min_d:
-                targets.append((d, ci, cj, start_id[ci][cj]))
+            min_d = dist
+            candidates.append((ci, cj, cf, start_id[ci][cj]))
             continue
 
         for k in range(4):
-            ni, nj = ci + di[k], cj + dj[k]
-            if 0 <= ni < n and 0 <= nj < n and area[ni][nj] != 1 and dist[ni][nj] == -1:
-                dist[ni][nj] = d + 1
-                q.append((ni, nj))
+            ni, nj = ci+di[k], cj+dj[k]
+            if 0<=ni<n and 0<=nj<n and not visited[ni][nj] and area[ni][nj]!=1:
+                visited[ni][nj] = True
+                q.append((ni, nj, cf-1))
 
-    if not targets:
+    if not candidates:
         return -1
 
-    # 거리 같으면 행, 열 순서
-    targets.sort(key=lambda x: (x[0], x[1], x[2]))
-    d, pi, pj, pnum = targets[0]
+    # 거리(연료는 cf로 반영돼있음) → 행 → 열
+    candidates.sort(key=lambda x: (ff-x[2], x[0], x[1]))
+    ci, cj, cf, who = candidates[0]
+    start_id[ci][cj] = 0  # 태운 자리 비우기
+    return ci, cj, cf, who
 
-    if fuel < d:
-        return -1
-
-    # 손님 태움 → 출발지 칸 비우기
-    start_id[pi][pj] = 0
-    return pi, pj, fuel - d, pnum
-
-# 목적지로 이동
-def to_dest(i, j, fuel, pnum):
-    er, ec = passengers[pnum]
+# 목적지 이동
+def to_dest(i, j, ff, who):
     q = deque()
-    q.append((i, j))
-    dist = [[-1]*n for _ in range(n)]
-    dist[i][j] = 0
+    q.append((i, j, ff))
+    visited = [[False]*n for _ in range(n)]
+    visited[i][j] = True
+    start_f = ff
+
+    er, ec = dest[who]
 
     while q:
-        ci, cj = q.popleft()
-        d = dist[ci][cj]
+        ci, cj, cf = q.popleft()
+        if cf < 0:
+            continue
 
-        if (ci, cj) == (er, ec):
-
-            if fuel < d:
-                return -1
-            # 도착하면 소모량*2 충전
-            fuel = fuel - d + (d * 2)  # = fuel + d
-            complete[pnum] = True
-            return ci, cj, fuel
+        if (ci, cj) == (er, ec):  # 도착
+            used = start_f - cf
+            ff = cf + used*2  # 연료 충전
+            complete[who] = True
+            return ci, cj, ff
 
         for k in range(4):
-            ni, nj = ci + di[k], cj + dj[k]
-            if 0 <= ni < n and 0 <= nj < n and area[ni][nj] != 1 and dist[ni][nj] == -1:
-                dist[ni][nj] = d + 1
-                q.append((ni, nj))
+            ni, nj = ci+di[k], cj+dj[k]
+            if 0<=ni<n and 0<=nj<n and not visited[ni][nj] and area[ni][nj]!=1:
+                visited[ni][nj] = True
+                q.append((ni, nj, cf-1))
 
     return -1
 
-
+# 시뮬레이션
 for _ in range(m):
-    res = find_p(si, sj, f)
-    if res == -1:
-        print(-1); sys.exit(0)
-    si, sj, f, who = res
+    res1 = find_p(si, sj, f)
+    if res1 == -1:
+        print(-1); exit()
+    si, sj, f, who = res1
 
     res2 = to_dest(si, sj, f, who)
     if res2 == -1:
-        print(-1); sys.exit(0)
+        print(-1); exit()
     si, sj, f = res2
 
 print(f)
