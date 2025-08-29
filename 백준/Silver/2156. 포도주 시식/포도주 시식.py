@@ -1,4 +1,5 @@
 import sys
+input = sys.stdin.readline
 
 n = int(input())
 cups = [int(input()) for _ in range(n)]
@@ -16,12 +17,3 @@ else:
 
     print(dp[n-1])
 
-# [6, 10, 13, 9, 8, 1]
-#
-#
-#
-# 3번째는 경우의 수가
-# 12 선택
-# 13 선택
-# 23 선택
-#
