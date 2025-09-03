@@ -3,50 +3,66 @@ sys.setrecursionlimit(10**6)
 input = sys.stdin.readline
 
 n, m, h = map(int, input().split())
+if m == 0:
+    print(0)
+    exit()
 
-# board[x][y] = 1 → y에서 y+1로 가는 가로선
-# board[x][y] = -1 → y+1에서 y로 가는 가로선
-board = [[0] * (n+1) for _ in range(h+1)]
-
+board = [[0] * n for _ in range(h)]
 for _ in range(m):
     a, b = map(int, input().split())
-    board[a][b] = 1
-    board[a][b+1] = -1
+    board[a-1][b-1] = 1
 
-def check():
-    for start in range(1, n+1):
+def check(return_count=False):
+    matched = 0
+    for start in range(n):
         j = start
-        for i in range(1, h+1):
-            j += board[i][j]
-        if j != start:
-            return False
-    return True
+        for i in range(h):
+            if j > 0 and board[i][j-1] == 1:
+                j -= 1
+            elif j < n-1 and board[i][j] == 1:
+                j += 1
+        if j == start:
+            matched += 1
+    if return_count:
+        return matched
+    return matched == n
 
 ans = 4
 
-# 가능한 후보 좌표(grid)에 대해서만 탐색
-grid = []
-for i in range(1, h+1):
-    for j in range(1, n):
-        if board[i][j] == 0 and board[i][j+1] == 0:
-            grid.append((i, j))
-
-def dfs(cnt, idx):
+def sol(count, row, col, max_cnt):
     global ans
+
+    # 현재까지 맞은 세로선 수
+    matched = check(return_count=True)
+    if matched + (max_cnt - count) * 2 < n:
+        return  # 남은 시도로도 모든 세로선을 맞출 수 없으면 중단
+
     if check():
-        ans = min(ans, cnt)
-        return
-    if cnt == 3 or cnt >= ans:  # 최대 3개
+        ans = min(ans, count)
         return
 
-    for k in range(idx, len(grid)):
-        x, y = grid[k]
-        if board[x][y] == 0 and board[x][y+1] == 0:  # 놓을 수 있는지 확인
-            board[x][y] = 1
-            board[x][y+1] = -1
-            dfs(cnt+1, k+1)   # 다음 후보부터 탐색
-            board[x][y] = 0
-            board[x][y+1] = 0
+    if count == max_cnt or count >= ans:
+        return
 
-dfs(0, 0)
-print(ans if ans < 4 else -1)
+    for i in range(row, h):
+        k = col if i == row else 0
+        for j in range(k, n-1):
+            if board[i][j] == 0 and board[i][j+1] == 0:
+                # 인접 체크
+                if j > 0 and board[i][j-1] == 1:
+                    continue
+                if j < n-2 and board[i][j+1] == 1:
+                    continue
+                board[i][j] = 1
+                sol(count+1, i, j+2, max_cnt)  
+                board[i][j] = 0
+
+# 최대 0~3개 추가하는 경우를 모두 시도
+found = False
+for max_cnt in range(4):
+    sol(0, 0, 0, max_cnt)
+    if ans != 4:
+        found = True
+        break
+
+print(ans if found else -1)
