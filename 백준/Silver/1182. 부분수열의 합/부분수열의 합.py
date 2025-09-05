@@ -1,46 +1,24 @@
 import sys
-input = sys.stdin.readline
+sys.setrecursionlimit(10**6)
 
-n, s = map(int, input().split())
-arr = list(map(int, input().split()))
+n, s = map(int, sys.stdin.readline().split())
+arr = list(map(int, sys.stdin.readline().split()))
 
 ans = 0
-used = []
-def sol(lst, idx):
+
+def dfs(idx, current_sum):
     global ans
-    # 최대길이
-    if len(lst) == n:
-        if sum(lst) == s:
-            ans += 1
+    if idx == n:  # 끝까지 다 본 경우
         return
 
-    # 중간에 만족
-    if len(lst) > 0 and sum(lst) == s:
+    # 이번 원소 선택
+    new_sum = current_sum + arr[idx]
+    if new_sum == s:
         ans += 1
+    dfs(idx + 1, new_sum)
 
-    for i in range(idx, n):
-        lst.append(arr[i])
-        sol(lst, i+1)
-        lst.pop()
+    # 이번 원소 선택 안 함
+    dfs(idx + 1, current_sum)
 
-sol([], 0)
+dfs(0, 0)
 print(ans)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
