@@ -3,24 +3,20 @@ input = sys.stdin.readline
 
 n = int(input())
 m = int(input())
-s = list(input())
+s = input().strip()
 # print(s)
 
-p = ['I'] + ['O', 'I'] * n
-# 시작
-start = 0
-end = start + 2*n
-
 ans = 0
-temp = s[start:end+1]
-if temp == p:
-    ans += 1
-# print(ans)
-for i in range(2*n+1, m):
-    temp.pop(0)
-    temp.append(s[i])
-    if temp == p:
-        ans += 1
-
+cnt = 0
+i = 0
+while i < m-2:
+    if s[i:i+3] == "IOI":
+        cnt += 1
+        if cnt >= n:
+            ans += 1
+        i += 2
+    else:
+        cnt = 0
+        i += 1
 print(ans)
 
