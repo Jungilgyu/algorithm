@@ -1,0 +1,17 @@
+-- 코드를 작성해주세요
+
+# 1. 2세대 (3, 4, 5) 서브쿼리를 만들어야함
+SELECT THIRD.ID
+FROM ECOLI_DATA THIRD
+JOIN
+    (SELECT C.ID 
+    FROM ECOLI_DATA C
+    JOIN (
+        SELECT ID
+        FROM ECOLI_DATA
+        WHERE PARENT_ID IS NULL
+    ) AS P
+    ON C.PARENT_ID = P.ID) AS SUB
+ON THIRD.PARENT_ID = SUB.ID
+ORDER BY THIRD.ID;
+
