@@ -1,24 +1,20 @@
-SELECT E.EMP_NO,
-       E.EMP_NAME,
-       S.GRADE,
-       FLOOR(E.SAL * S.PERCENT) AS BONUS
+-- 코드를 작성해주세요
+SELECT E.EMP_NO, E.EMP_NAME,
+    CASE 
+        WHEN SUM(G.SCORE) / 2 < 80 THEN "C"
+        WHEN SUM(G.SCORE) / 2 < 90 THEN "B"
+        WHEN SUM(G.SCORE) / 2 < 96 THEN "A"
+        ELSE "S"
+    END AS GRADE,
+    CASE
+        WHEN SUM(G.SCORE) / 2 < 80 THEN 0
+        WHEN SUM(G.SCORE) / 2 < 90 THEN E.SAL * 0.1
+        WHEN SUM(G.SCORE) / 2 < 96 THEN E.SAL * 0.15
+        ELSE E.SAL * 0.2
+    END AS BONUS
 FROM HR_EMPLOYEES E
-JOIN (
-    SELECT EMP_NO,
-           CASE
-             WHEN AVG(SCORE) >= 96 THEN 'S'
-             WHEN AVG(SCORE) >= 90 THEN 'A'
-             WHEN AVG(SCORE) >= 80 THEN 'B'
-             ELSE 'C'
-           END AS GRADE,
-           CASE
-             WHEN AVG(SCORE) >= 96 THEN 0.20
-             WHEN AVG(SCORE) >= 90 THEN 0.15
-             WHEN AVG(SCORE) >= 80 THEN 0.10
-             ELSE 0
-           END AS PERCENT
-    FROM HR_GRADE
-    GROUP BY EMP_NO
-) S
-  ON E.EMP_NO = S.EMP_NO
+JOIN HR_GRADE G
+ON E.EMP_NO = G.EMP_NO
+GROUP BY E.EMP_NO
 ORDER BY E.EMP_NO;
+    
