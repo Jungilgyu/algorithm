@@ -1,6 +1,6 @@
 # [level 2] 조건에 맞는 사원 정보 조회하기 - 284527 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/284527?gad_source=1&gad_campaignid=22499034228&gbraid=0AAAAAC_c4nB9RIiidHUeMW0ShmqDscRXH&gclid=CjwKCAjw04HIBhB8EiwA8jGNbaMweJ-sphZV0E0nHjxkqJvjaMRPcxXW7h2Qq-Ru7O_b6sKe1uoVTxoCpNUQAvD_BwE) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/284527) 
 
 ### 성능 요약
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 10월 29일 14:48:56
+2026년 01월 04일 18:28:41
 
 ### 문제 설명
 
