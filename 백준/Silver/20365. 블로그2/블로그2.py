@@ -4,26 +4,15 @@ input = sys.stdin.readline
 n = int(input())
 target = input().strip()
 
-r = 0
-b = 0
+r = list(target.split('B'))
+b = list(target.split('R'))
+r_cnt = 0
+b_cnt = 0
+for block in r:
+    if block != '':
+        r_cnt += 1
+for block in b:
+    if block != '':
+        b_cnt += 1
 
-# 첫 덩어리
-prev = target[0]
-if prev == 'R':
-    r += 1
-else:
-    b += 1
-
-for i in range(1, n):
-    if target[i] != prev:
-        if target[i] == 'R':
-            r += 1
-        else:
-            b += 1
-
-        prev = target[i]
-
-print(min(r, b) + 1)
-
-
-
+print(min(r_cnt, b_cnt) + 1)
