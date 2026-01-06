@@ -13,22 +13,17 @@ for _ in range(m):
     adj_arr[a].append(b)
     adj_arr[b].append(a)
 
+visited = [False] * (n+1)
+visited[1] = True
+ans = 0
 
-def bfs():
-    q = deque()
-    q.append([1, 0]) # depth
+for neighbor in adj_arr[1]:
+    if not visited[neighbor]:
+        visited[neighbor] = True
+        ans += 1
 
-    p = set()
-    while q:
-        current, depth = q.popleft()
-
-        if depth >= 2:
-            continue
-
-        for neighbor in adj_arr[current]:
-            p.add(neighbor)
-            q.append([neighbor, depth + 1])
-
-    return len(p) - 1 if p else 0
-
-print(bfs())
+    for nneighbor in adj_arr[neighbor]:
+        if not visited[nneighbor]:
+            visited[nneighbor] = True
+            ans += 1
+print(ans)
